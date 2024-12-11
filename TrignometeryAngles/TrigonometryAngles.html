@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Divided Page Vertically</title>
+  <style>
+    /* BODY: The whole sheet of paper where you place your designs. */
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* LEFT PART: The left half of the page. */
+    .left-part {
+      width: 50%;
+      height: 100%;
+      border: 5px solid black;
+      background-color: lightblue;
+      display: flex;
+      justify-content: center;  /* Horizontally center the canvas */
+      align-items: center;  /* Vertically center the canvas */
+      position: relative; /* Make sure the left part is positioned relative to contain the slider */
+    }
+
+    #triangleCanvas {
+      border: 1px solid black;
+      position: relative;
+      height: 550px; /* Increase height for more space */
+      width: 75%; /* Ensure the canvas takes up full width */
+    }
+      
+    /* Slider Container positioned inside the canvas */
+    .sliderContainer {
+      position: absolute;
+      bottom: 135px; /* Place slider near the bottom of the canvas */
+      left: 50%;
+      transform: translateX(-50%); /* Center the slider horizontally */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 65%;
+      z-index: 10;
+    }
+
+    .sliderContainer input {
+      width: 50%; /* Adjust the width of the slider */
+    }
+
+    .sliderContainer label {
+      margin-right: 5px; /* Space between label and slider */
+    }
+
+    /* RIGHT PART: The right half of the page. */
+    .right-part {
+      width: 50%;
+      height: 100%;
+      border: 5px solid black;
+      background-color: lightgreen;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT PART: The left half of the page. -->
+  <div class="left-part">
+   <canvas id="triangleCanvas" width="500" height="500"></canvas>
+   <div class="sliderContainer">
+        <label for="thetaSlider">Angle θ (degrees): </label>
+        <input type="range" id="thetaSlider" min="0" max="90" value="45">
+        <span id="thetaValue">45°</span>
+    </div> 
+  </div>
+
+  <!-- RIGHT PART: The right half of the page. -->
+  <div class="right-part">
+    <h3 style="text-indent: 2px;"> Relation between Trignometry Angles and Right-Angled Triangle Sides </h3>
+    <p style="text-indent: 2px; margin:2px"> 
+     This stimulation tool the right-angled triangle sides ratio with respect to Sin θ & Cos θ. Below are few observations:</p>
+    <ul>
+       <li> When θ = 45°, Opposite Side = Adjacent side. </li>
+       <li> When θ = 90°, Opposite Side = Hypotenuse.    </li>
+       <li> When θ = 00°, Adjacent Side = Hypotenuse.    </li> </ul>
+    <p style="text-indent: 2px; margin:2px"> 
+     Relation between sildes of right-angled triangle and theta: 
+     <ul> 
+     <li> Sin(θ) = <sup>Opposite Side</sup> / <sub>Hypotenuse </sub> </li>
+     <li> Cos(θ) = <sup>Adjacent Side</sup> / <sub>Hypotenuse </sub> </li></ul></p>
+     <p style="text-indent: 2px; margin:2px"> 
+     The ratio between Opposite Side and Adjacent Side is given by Tan θ with respect to θ:  
+     <ul>
+     <li> Tan(θ) = <sup>Opposite Side</sup> / <sub>Adjacent Side </sub> </li> </p>
+  </div>
+
+  <script>
+     // Set the hypotenuse length
+        const hypotenuse = 300; // Constant value for hypotenuse
+        const canvas = document.getElementById("triangleCanvas");
+        const ctx = canvas.getContext("2d");
+        const slider = document.getElementById("thetaSlider");
+        const thetaValue = document.getElementById("thetaValue");
+        
+     // Function to draw the triangle
+        function drawTriangle(theta) {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+     // Convert theta to radians for trig calculations
+            //const theta = 45
+            const thetaRad = theta * (Math.PI / 180);
+
+    // Calculate the adjacent and opposite sides based on the hypotenuse
+            const adjacent = hypotenuse * Math.cos(thetaRad);
+            const opposite = hypotenuse * Math.sin(thetaRad);
+
+     // Draw the triangle
+            ctx.beginPath();
+            ctx.moveTo(97, 310); // Bottom-left corner (origin)
+            ctx.lineTo(97 + adjacent, 310); // Adjacent side
+            ctx.lineTo(97, 310 - opposite); // Opposite side
+            ctx.closePath();
+
+     // Fill the triangle with a color
+            ctx.fillStyle = "rgba(0, 33, 255, 0.3)";
+            ctx.fill();
+
+    // Draw the triangle sides
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+    
+    // Label the sides
+   // Label the opposite side (Y-axis) - Dynamic Vertical Position
+      ctx.font = "16px Arial";
+      ctx.fillStyle = "black";
+      ctx.save()
+      ctx.translate(97 - 9, 380 - opposite / 2); // Positioning text slightly left for rotation
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(`Opposite = ${(opposite/212.13).toFixed(2)}`, 0, 0); // Move up/down with the opposite side
+      ctx.restore();
+
+  // Label the adjacent side (X-axis) - Dynamic Horizontal Position
+      ctx.fillText(`Adjacent = ${(adjacent/212.13).toFixed(2)}`, 50 + adjacent / 2, 300 + 30); // Move right/left with the adjacent side
+       
+      ctx.fillText(`Sin  θ = ${theta}°`, 105.87 + adjacent, 300)
+      ctx.fillText(`Cos θ = ${theta}°`, 105.87 + adjacent, 315) 
+}
+
+     // Initial drawing
+        drawTriangle(45);
+
+    // Event listener to update the angle when slider changes
+        slider.addEventListener("input", function() {
+            const theta = slider.value;
+            thetaValue.textContent = `${theta}°`;
+            drawTriangle(theta);
+        });
+
+    //document.querySelector('.left-part').addEventListener('click', function() {
+    //  this.style.border = '5px dashed red';
+    //});
+
+    document.querySelector('.right-part').addEventListener('click', function() {
+      //this.style.border = '5px dashed blue';
+    });
+  </script>
+
+</body>
+</html>
